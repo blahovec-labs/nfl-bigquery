@@ -34,6 +34,14 @@ def build_parser() -> argparse.ArgumentParser:
     dc.add_argument("--table", help="project.dataset.table (required for bq-apply)")
     dc.add_argument("--output", default="-", help="output path or - for stdout")
 
+    vf = sub.add_parser("verify", help="Run data-quality checks")
+    vf.add_argument("--source", default="internal", choices=["internal"])
+    vf.add_argument("--season", type=int, required=True)
+    vf.add_argument("--pbp-table", required=True)
+    vf.add_argument("--games-table")
+    vf.add_argument("--weekly-stats-table")
+    vf.add_argument("--tolerance", type=float, default=1.0)
+
     return parser
 
 
@@ -111,6 +119,24 @@ def main(argv: list[str] | None = None) -> int:
 
             Path(ns.output).write_text(text, encoding="utf-8")
         return 0
+    if ns.command == "verify":
+        from google.cloud import bigquery
+
+        from nfl_bigquery.verify.internal import run_internal
+        from nfl_bigquery.writer import TableRef
+
+        pbp = TableRef.parse(ns.pbp_table)
+        games = ns.games_table or f"{pbp.project}.{pbp.dataset}.games"
+        stats = ns.weekly_stats_table or f"{pbp.project}.{pbp.dataset}.weekly_player_stats"
+        results = run_internal(
+            bigquery.Client(), plays_ref=str(pbp), games_ref=games, stats_ref=stats,
+            season=ns.season, tolerance=ns.tolerance)
+        failed = 0
+        for r in results:
+            mark = "PASS" if r.passed else "FAIL"
+            print(f"[{mark}] {r.name}: {r.detail}")
+            failed += 0 if r.passed else 1
+        return 1 if failed else 0
     return 0
 
 
