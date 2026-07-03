@@ -56,3 +56,13 @@ def to_bq_schema(specs: list[ColumnSpec]) -> list[bigquery.SchemaField]:
 
 def spec_names(specs: list[ColumnSpec]) -> list[str]:
     return [s.name for s in specs]
+
+
+INGESTED_AT_SPEC = ColumnSpec(
+    name="ingested_at", type="TIMESTAMP", mode="REQUIRED",
+    short_description="UTC timestamp this row was written to BigQuery.",
+    business_definition="Ingestion timestamp set by nfl-bigquery at write time.",
+    semantic_tags=["lineage"], valid_range=None, valid_values=None,
+    example_value=None, gotchas=[], source_field="(synthetic)",
+    dictionary_type=None, deprecated_in_year=None,
+)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from nfl_bigquery.dictionary import build_specs
 from nfl_bigquery.partition import TimePartition
-from nfl_bigquery.schema import ColumnSpec
+from nfl_bigquery.schema import INGESTED_AT_SPEC, ColumnSpec
 
 GAMES_TYPE_OVERRIDES = {"gameday": "DATE", "game_date": "DATE"}
 GAMES_ENRICHMENT = {
@@ -39,5 +39,5 @@ def _build() -> list[ColumnSpec]:
     return renamed
 
 
-GAMES_SCHEMA: list[ColumnSpec] = _build()
+GAMES_SCHEMA: list[ColumnSpec] = _build() + [INGESTED_AT_SPEC]
 GAMES_PARTITION = TimePartition(field="game_date", clustering=["season", "week"])

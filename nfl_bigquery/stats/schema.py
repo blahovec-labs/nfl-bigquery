@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from nfl_bigquery.dictionary import build_specs
 from nfl_bigquery.partition import SeasonRangePartition
-from nfl_bigquery.schema import ColumnSpec
+from nfl_bigquery.schema import INGESTED_AT_SPEC, ColumnSpec
 
 WEEKLY_STATS_ENRICHMENT = {
     "player_id": {"mode": "REQUIRED", "semantic_tags": ["identifier", "join_key"],
@@ -21,5 +21,5 @@ WEEKLY_STATS_ENRICHMENT = {
 
 WEEKLY_STATS_SCHEMA: list[ColumnSpec] = build_specs(
     "player_stats", enrichment=WEEKLY_STATS_ENRICHMENT,
-)
+) + [INGESTED_AT_SPEC]
 WEEKLY_STATS_PARTITION = SeasonRangePartition(clustering=["week", "player_id"])
