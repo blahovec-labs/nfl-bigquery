@@ -64,3 +64,6 @@ testpaths = ["tests"]
 markers = [
     "network: tests that hit nflverse over the network; skipped in CI",
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning:db_dtypes",
+]
