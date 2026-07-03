@@ -3,6 +3,8 @@ llm / bq-apply / markdown / dictionary / dbt.
 """
 from __future__ import annotations
 
+import json
+
 from nfl_bigquery.docs.taxonomy import TABLES, TableDoc
 
 
@@ -19,7 +21,7 @@ def render_llm(tables: dict[str, TableDoc]) -> str:
     return "\n".join(lines)
 
 
-def render_bq_apply(table_name: str, ref: str) -> list[tuple[str, str]]:
+def render_bq_apply(table_name: str) -> list[tuple[str, str]]:
     t = TABLES[table_name]
     return [(c.name, c.short_description[:1024]) for c in t.columns]
 
@@ -63,12 +65,12 @@ def render_dbt(tables: dict[str, TableDoc]) -> str:
     for t in tables.values():
         lines += [
             f"  - name: {t.name}",
-            f'    description: "{t.description}"',
+            f"    description: {json.dumps(t.description)}",
             "    columns:",
         ]
         for c in t.columns:
             lines += [
                 f"      - name: {c.name}",
-                f'        description: "{c.short_description}"',
+                f"        description: {json.dumps(c.short_description)}",
             ]
     return "\n".join(lines)

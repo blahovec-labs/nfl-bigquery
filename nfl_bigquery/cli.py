@@ -85,7 +85,9 @@ def main(argv: list[str] | None = None) -> int:
 
             bq = bigquery.Client()
             table_name = ns.table.split(".")[-1]
-            desc = {n: d for n, d in render_bq_apply(table_name, ns.table)}
+            if table_name not in TABLES:
+                parser.error(f"unknown table '{table_name}'; choices: {sorted(TABLES)}")
+            desc = {n: d for n, d in render_bq_apply(table_name)}
             fetched = bq.get_table(ns.table)
             new_schema = [
                 bigquery.SchemaField(
