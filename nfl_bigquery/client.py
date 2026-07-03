@@ -16,7 +16,7 @@ class NflverseClient:
         self.max_retries = max_retries
         self.backoff_seconds = backoff_seconds
 
-    def _retry(self, fn, *args):
+    def _retry(self, fn, *args) -> pd.DataFrame:
         last: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             try:
@@ -31,7 +31,8 @@ class NflverseClient:
                     e,
                     wait,
                 )
-                time.sleep(wait)
+                if attempt < self.max_retries:
+                    time.sleep(wait)
         raise RuntimeError(f"nflverse load failed after {self.max_retries} attempts") from last
 
     def load_pbp(self, season: int) -> pd.DataFrame:

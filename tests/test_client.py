@@ -1,5 +1,6 @@
 # tests/test_client.py
 import pandas as pd
+import pytest
 
 import nfl_bigquery.client as client_mod
 from nfl_bigquery.client import NflverseClient
@@ -33,3 +34,20 @@ def test_load_retries_then_succeeds(monkeypatch):
     out = NflverseClient(max_retries=5).load_schedules(2023)
     assert calls["n"] == 3
     assert len(out) == 1
+
+
+def test_load_raises_after_exhausting_retries(monkeypatch):
+    sleep_calls = {"n": 0}
+
+    def always_fails(seasons):
+        raise RuntimeError("permanent failure")
+
+    def count_sleep(s):
+        sleep_calls["n"] += 1
+
+    monkeypatch.setattr(client_mod.nfl, "load_pbp", always_fails)
+    monkeypatch.setattr(client_mod.time, "sleep", count_sleep)
+    client = NflverseClient(max_retries=2)
+    with pytest.raises(RuntimeError):
+        client.load_pbp(2023)
+    assert sleep_calls["n"] <= client.max_retries - 1
