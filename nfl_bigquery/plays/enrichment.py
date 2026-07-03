@@ -10,9 +10,6 @@ NOT force BOOL on nflfastR's 0/1 numeric indicators.
 """
 from __future__ import annotations
 
-# Columns we promote to REQUIRED (always present + used as keys/partitions).
-_REQUIRED = ("game_id", "play_id", "season", "week", "game_date")
-
 ENRICHMENT: dict[str, dict] = {
     # --- REQUIRED identifiers ---
     "game_id": {
@@ -38,10 +35,13 @@ ENRICHMENT: dict[str, dict] = {
         "valid_range": (1.0, 22.0), "example_value": 1,
     },
     "game_date": {
-        "mode": "REQUIRED", "type": "DATE",
+        "mode": "REQUIRED",
         "semantic_tags": ["identifier", "partition_key"],
         "example_value": "2023-09-07",
     },
+    # --- team dimension ---
+    "home_team": {"semantic_tags": ["dimension"]},
+    "away_team": {"semantic_tags": ["dimension"]},
     # --- categorical with valid_values ---
     "play_type": {
         "semantic_tags": ["dimension"],
@@ -52,7 +52,15 @@ ENRICHMENT: dict[str, dict] = {
     },
     "posteam": {"semantic_tags": ["dimension", "cluster_key"], "example_value": "KC"},
     "defteam": {"semantic_tags": ["dimension"], "example_value": "DET"},
-    # --- bounded float metrics with gotchas ---
+    # --- score situation ---
+    "home_score": {"semantic_tags": ["situation"], "valid_range": (0.0, 80.0)},
+    "away_score": {"semantic_tags": ["situation"], "valid_range": (0.0, 80.0)},
+    "posteam_score": {"semantic_tags": ["situation"], "valid_range": (0.0, 80.0)},
+    "defteam_score": {"semantic_tags": ["situation"], "valid_range": (0.0, 80.0)},
+    # --- game state / situation ---
+    "qtr": {"semantic_tags": ["situation"], "valid_range": (1.0, 6.0)},
+    "drive": {"semantic_tags": ["situation"]},
+    # --- bounded float metrics ---
     "epa": {
         "semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0),
         "example_value": 0.42,
@@ -77,6 +85,13 @@ ENRICHMENT: dict[str, dict] = {
         "semantic_tags": ["metric", "modeled"], "valid_range": (0.0, 1.0),
         "example_value": 0.55, "gotchas": ["Pre-play posteam win probability."],
     },
+    # --- EPA decomposition (air/YAC/QB) ---
+    "air_epa": {"semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0)},
+    "yac_epa": {"semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0)},
+    "comp_air_epa": {"semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0)},
+    "comp_yac_epa": {"semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0)},
+    "qb_epa": {"semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0)},
+    "xyac_epa": {"semantic_tags": ["metric", "modeled"], "valid_range": (-15.0, 15.0)},
     # --- bounded counts ---
     "down": {"type": "INT64", "semantic_tags": ["dimension"], "valid_range": (1.0, 4.0)},
     "ydstogo": {"type": "INT64", "semantic_tags": ["situation"], "valid_range": (0.0, 99.0)},
@@ -87,6 +102,8 @@ ENRICHMENT: dict[str, dict] = {
     "yards_gained": {"semantic_tags": ["metric"], "valid_range": (-99.0, 99.0)},
     "score_differential": {"semantic_tags": ["situation"], "valid_range": (-59.0, 59.0)},
     "game_seconds_remaining": {"semantic_tags": ["situation"], "valid_range": (0.0, 3600.0)},
+    "penalty_yards": {"semantic_tags": ["metric"], "valid_range": (0.0, 100.0)},
+    "kick_distance": {"semantic_tags": ["metric"], "valid_range": (0.0, 80.0)},
     # --- 0/1 indicators (nflfastR stores these as numeric doubles; keep them
     #     data-derived FLOAT64 rather than forcing BOOL, which fights the source
     #     dtype and needs no coercion) ---
@@ -97,6 +114,16 @@ ENRICHMENT: dict[str, dict] = {
     "sack": {"semantic_tags": ["outcome"]},
     "success": {"semantic_tags": ["metric", "modeled"],
                 "gotchas": ["1.0 if EPA > 0 for the posteam (nflfastR 0/1 double)."]},
+    "first_down": {"semantic_tags": ["outcome"]},
+    "third_down_converted": {"semantic_tags": ["outcome"]},
+    "fourth_down_converted": {"semantic_tags": ["outcome"]},
+    "touchdown": {"semantic_tags": ["outcome"]},
+    "penalty": {"semantic_tags": ["outcome"]},
+    # --- outcome with valid_values ---
+    "field_goal_result": {
+        "semantic_tags": ["outcome"],
+        "valid_values": ["made", "missed", "blocked"],
+    },
     # --- actor ids ---
     "passer_player_id": {
         "semantic_tags": ["identifier", "actor"],
@@ -106,4 +133,22 @@ ENRICHMENT: dict[str, dict] = {
                           "gotchas": ["gsis_id; join dim_players.gsis_id."]},
     "receiver_player_id": {"semantic_tags": ["identifier", "actor"],
                             "gotchas": ["gsis_id; join dim_players.gsis_id."]},
+    # --- actor names ---
+    "passer_player_name": {
+        "semantic_tags": ["actor"],
+        "gotchas": ["Human-readable; join via the matching *_player_id (gsis_id)."],
+    },
+    "rusher_player_name": {
+        "semantic_tags": ["actor"],
+        "gotchas": ["Human-readable; join via the matching *_player_id (gsis_id)."],
+    },
+    "receiver_player_name": {
+        "semantic_tags": ["actor"],
+        "gotchas": ["Human-readable; join via the matching *_player_id (gsis_id)."],
+    },
+    # --- fantasy identifier ---
+    "fantasy_player_id": {
+        "semantic_tags": ["identifier", "actor"],
+        "gotchas": ["gsis_id of the primary fantasy player on the play."],
+    },
 }

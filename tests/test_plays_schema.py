@@ -14,6 +14,8 @@ def test_core_identifiers_required():
         assert by[col].mode == "REQUIRED", col
     assert by["game_date"].type == "DATE"
     assert by["ingested_at"].type == "TIMESTAMP"
+    assert by["season"].type == "INT64"
+    assert by["week"].type == "INT64"
 
 
 def test_key_columns_enriched():
