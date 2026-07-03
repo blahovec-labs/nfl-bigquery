@@ -29,6 +29,11 @@ nfl-bigquery verify --source internal --season 2024 \
     --pbp-table myproject.mydataset.nfl_plays
 ```
 
+The `verify` command runs 8 checks: duplicate-play detection, orphan-play detection, and
+plays→weekly reconciliation for **passing/rushing/receiving yards and TDs** (6 metrics).
+The `--tolerance` flag (default 0.0) sets the maximum allowed absolute aggregate diff;
+lateral plays cause small legitimate yard diffs, so consider `--tolerance 5` for yards.
+
 ## Data source
 All data from [nflverse](https://nflreadpy.nflverse.com/) via `nflreadpy`. Play-by-play is
 nflfastR's 372-column feed (EPA/WPA/air-yards/CPOE modeled), back to 1999.

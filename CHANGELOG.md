@@ -6,5 +6,6 @@
 - `players`: `dim_players` MERGE upsert on `gsis_id`.
 - `docs`: llm / bq-apply / markdown / dictionary / dbt renderers from dictionary-seeded
   ColumnSpecs + enrichment overlay.
-- `verify`: internal consistency + plays→weekly passing-yards reconciliation.
+- `verify`: internal consistency + plays→weekly reconciliation for passing/rushing/receiving
+  yards and TDs (6 metrics, 8 checks total).
 - Schema-drift guard test against nflverse fixtures.
