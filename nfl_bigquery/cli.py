@@ -135,7 +135,8 @@ def main(argv: list[str] | None = None) -> int:
         for r in results:
             mark = "PASS" if r.passed else "FAIL"
             print(f"[{mark}] {r.name}: {r.detail}")
-            failed += 0 if r.passed else 1
+            if not r.passed:
+                failed += 1
         return 1 if failed else 0
     return 0
 
