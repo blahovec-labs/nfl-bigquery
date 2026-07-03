@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 from google.cloud import bigquery
+from google.cloud.exceptions import NotFound
 
 from nfl_bigquery.partition import SeasonRangePartition, TimePartition
 
@@ -72,7 +73,7 @@ class BigQueryWriter:
         try:
             self.client.get_table(str(ref))
             return
-        except Exception:
+        except NotFound:
             pass
         table = bigquery.Table(str(ref), schema=schema)
         if isinstance(partition, TimePartition):
@@ -98,7 +99,7 @@ class BigQueryWriter:
             return 0
         try:
             bq_schema = list(self.client.get_table(str(ref)).schema)
-        except Exception:
+        except NotFound:
             bq_schema = []
         self.client.query(
             f"DELETE FROM `{ref}` WHERE season = @season",
