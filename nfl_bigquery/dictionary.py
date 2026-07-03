@@ -59,7 +59,7 @@ def build_specs(
             type=over.get("type", map_bq_type(str(row["type"]), name, type_overrides)),
             mode=over.get("mode", "NULLABLE"),
             short_description=over.get("short_description", desc)[:1024],
-            business_definition=over.get("business_definition", desc),
+            business_definition=(over.get("business_definition") or desc),
             semantic_tags=over.get("semantic_tags", []),
             valid_range=over.get("valid_range"),
             valid_values=over.get("valid_values"),

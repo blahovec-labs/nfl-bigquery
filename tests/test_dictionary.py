@@ -26,6 +26,8 @@ def test_build_specs_from_mini_fixture():
     epa = next(s for s in specs if s.name == "epa")
     assert epa.type == "FLOAT64"
     assert epa.business_definition  # seeded from description
+    assert epa.source_field == "epa"
+    assert epa.dictionary_type == "numeric"
 
 
 def test_enrichment_overlay_merges():
@@ -39,3 +41,11 @@ def test_enrichment_overlay_merges():
     assert epa.semantic_tags == ["metric", "modeled"]
     assert epa.valid_range == (-15.0, 15.0)
     assert epa.gotchas == ["Null on no-play rows."]
+
+
+def test_empty_description_falls_back(tmp_path):
+    (tmp_path / "d.csv").write_text("field,description,type\nfoo,,character\n", encoding="utf-8")
+    specs = build_specs("d", dict_dir=tmp_path)
+    spec = next(s for s in specs if s.name == "foo")
+    assert spec.business_definition.strip()
+    assert spec.short_description.strip()
