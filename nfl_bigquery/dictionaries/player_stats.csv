@@ -1,0 +1,49 @@
+field,description,type
+player_id,ID of the player. Use this to join to other sources.,id of the player. use this to join to other sources.
+player_name,Name of the player,name of the player
+recent_team,Most recent team player appears in `pbp` with.,most recent team player appears in `pbp` with.
+season,Official NFL season,official nfl season
+week,Game week number,game week number
+season_type,"`REG` for regular season, `POST` for postseason","`reg` for regular season, `post` for postseason"
+completions,The number of completed passes.,the number of completed passes.
+attempts,The number of pass attempts as defined by the NFL.,the number of pass attempts as defined by the nfl.
+passing_yards,Yards gained on pass plays.,yards gained on pass plays.
+passing_tds,The number of passing touchdowns.,the number of passing touchdowns.
+interceptions,The number of interceptions thrown.,the number of interceptions thrown.
+sacks,The Number of times sacked.,the number of times sacked.
+sack_yards,Yards lost on sack plays.,yards lost on sack plays.
+sack_fumbles,The number of sacks with a fumble.,the number of sacks with a fumble.
+sack_fumbles_lost,The number of sacks with a lost fumble.,the number of sacks with a lost fumble.
+passing_air_yards,Passing air yards (includes incomplete passes).,passing air yards (includes incomplete passes).
+passing_yards_after_catch,Yards after the catch gained on plays in which player was the passer (this is an unofficial stat and may differ slightly between different sources).,yards after the catch gained on plays in which player was the passer (this is an unofficial stat and may differ slightly between different sources).
+passing_first_downs,First downs on pass attempts.,first downs on pass attempts.
+passing_epa,"Total expected points added on pass attempts and sacks. NOTE: this uses the variable `qb_epa`, which gives QB credit for EPA for up to the point where a receiver lost a fumble after a completed catch and makes EPA work more like passing yards on plays with fumbles.","total expected points added on pass attempts and sacks. note: this uses the variable `qb_epa`, which gives qb credit for epa for up to the point where a receiver lost a fumble after a completed catch and makes epa work more like passing yards on plays with fumbles."
+passing_2pt_conversions,Two-point conversion passes.,two-point conversion passes.
+dakota,Adjusted EPA + CPOE composite based on coefficients which best predict adjusted EPA/play in the following year.,adjusted epa + cpoe composite based on coefficients which best predict adjusted epa/play in the following year.
+carries,The number of official rush attempts (incl. scrambles and kneel downs). Rushes after a lateral reception don't count as carry.,the number of official rush attempts (incl. scrambles and kneel downs). rushes after a lateral reception don't count as carry.
+rushing_yards,Yards gained when rushing with the ball (incl. scrambles and kneel downs). Also includes yards gained after obtaining a lateral on a play that started with a rushing attempt.,yards gained when rushing with the ball (incl. scrambles and kneel downs). also includes yards gained after obtaining a lateral on a play that started with a rushing attempt.
+rushing_tds,The number of rushing touchdowns (incl. scrambles). Also includes touchdowns after obtaining a lateral on a play that started with a rushing attempt.,the number of rushing touchdowns (incl. scrambles). also includes touchdowns after obtaining a lateral on a play that started with a rushing attempt.
+rushing_fumbles,The number of rushes with a fumble.,the number of rushes with a fumble.
+rushing_fumbles_lost,The number of rushes with a lost fumble.,the number of rushes with a lost fumble.
+rushing_first_downs,First downs on rush attempts (incl. scrambles).,first downs on rush attempts (incl. scrambles).
+rushing_epa,Expected points added on rush attempts (incl. scrambles and kneel downs).,expected points added on rush attempts (incl. scrambles and kneel downs).
+rushing_2pt_conversions,Two-point conversion rushes,two-point conversion rushes
+receptions,The number of pass receptions. Lateral receptions officially don't count as reception.,the number of pass receptions. lateral receptions officially don't count as reception.
+targets,The number of pass plays where the player was the targeted receiver.,the number of pass plays where the player was the targeted receiver.
+receiving_yards,Yards gained after a pass reception. Includes yards gained after receiving a lateral on a play that started as a pass play.,yards gained after a pass reception. includes yards gained after receiving a lateral on a play that started as a pass play.
+receiving_tds,The number of touchdowns following a pass reception. Also includes touchdowns after receiving a lateral on a play that started as a pass play.,the number of touchdowns following a pass reception. also includes touchdowns after receiving a lateral on a play that started as a pass play.
+receiving_air_yards,Receiving air yards (incl. incomplete passes).,receiving air yards (incl. incomplete passes).
+receiving_yards_after_catch,Yards after the catch gained on plays in which player was receiver (this is an unofficial stat and may differ slightly between different sources).,yards after the catch gained on plays in which player was receiver (this is an unofficial stat and may differ slightly between different sources).
+receiving_fumbles,The number of fumbles after a pass reception.,the number of fumbles after a pass reception.
+receiving_fumbles_lost,The number of fumbles lost after a pass reception.,the number of fumbles lost after a pass reception.
+receiving_2pt_conversions,Two-point conversion receptions,two-point conversion receptions
+fantasy_points,Standard fantasy points.,standard fantasy points.
+fantasy_points_ppr,PPR fantasy points.,ppr fantasy points.
+air_yards_share,Player's share of the team's air yards in this game,player's share of the team's air yards in this game
+pacr,Passing (yards) Air (yards) Conversion Ratio - the number of passing yards per air yards thrown per game,passing (yards) air (yards) conversion ratio - the number of passing yards per air yards thrown per game
+racr,Receiving (yards) Air (yards) Conversion Ratio - the number of receiving yards per air yards targeted per game,receiving (yards) air (yards) conversion ratio - the number of receiving yards per air yards targeted per game
+receiving_epa,Total EPA on plays where this receiver was targeted,total epa on plays where this receiver was targeted
+receiving_first_downs,Total number of first downs gained on receptions,total number of first downs gained on receptions
+special_teams_tds,Total number of kick/punt return touchdowns,total number of kick/punt return touchdowns
+wopr,Weighted OPportunity Rating - 1.5 x target_share + 0.7 x air_yards_share - a weighted average that contextualizes total fantasy usage.,weighted opportunity rating - 1.5 x target_share + 0.7 x air_yards_share - a weighted average that contextualizes total fantasy usage.
+target_share,"""Player's share of team receiving targets in this game""","""player's share of team receiving targets in this game"""

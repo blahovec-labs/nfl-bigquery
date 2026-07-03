@@ -1,0 +1,8 @@
+field,description,type
+game_id,Ten digit identifier for the game.,character
+season,4 digit year of the season.,numeric
+week,Week of the season.,numeric
+game_date,Date of the game.,character
+posteam,Team on offense.,character
+epa,Expected points added on the play.,numeric
+pass_touchdown,Binary indicator for pass touchdown.,numeric

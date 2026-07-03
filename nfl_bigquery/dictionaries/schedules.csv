@@ -1,0 +1,46 @@
+field,description,type
+game_id,"A human-readable game ID. It consists of: the season, an underscore, the two-digit week number, an underscore, the away team, an underscore, the home team. This is the primary identifier for a given game and is also used in various nflverse dataframes.",numeric
+season,"The year of the NFL season. This represents the whole season, so regular season games that happen in January as well as playoff games will occur in the year after this number.",numeric
+game_type,"What type of game? One of REG, WC, DIV, CON, SB",character
+week,The week of the NFL season the game occurs in. Please note that the `game_type` will differ for weeks >= 18 because of the season expansion in 2021. Please use `game_type` to filter for regular season or postseason.,numeric
+gameday,The date on which the game occurred.,character
+weekday,The day of the week on which the game occcured.,character
+gametime,"The kickoff time of the game. This is represented in 24-hour time and the Eastern time zone, regardless of what time zone the game was being played in.",character
+away_team,The away team.,character
+away_score,The number of points the away team scored. Is NA for games which haven't yet been played.,numeric
+home_team,The home team. Note that this contains the designated home team for games which no team is playing at home such as Super Bowls or NFL International games.,character
+home_score,The number of points the home team scored. Is NA for games which haven't yet been played.,numeric
+location,"Either Home if the home team is playing in their home stadium, or Neutral if the game is being played at a neutral location. This still shows as Home for games between the Giants and Jets even though they share the same home stadium.",character
+result,The number of points the home team scored minus the number of points the visiting team scored. Equals h_score - v_score. Is NA for games which haven't yet been played. Convenient for evaluating against the spread bets.,numeric
+total,The sum of each team's score in the game. Equals h_score + v_score. Is NA for games which haven't yet been played. Convenient for evaluating over/under total bets.,numeric
+overtime,Binary indicator of whether or not game went to overtime.,numeric
+old_game_id,The old id for the game assigned by the NFL.,numeric
+gsis,The id of the game issued by the NFL Game Statistics & Information System.,numeric
+nfl_detail_id,The id of the game issued by NFL Detail.,numeric
+pfr,The id of the game issued by [Pro-Football-Reference](https://www.pro-football-reference.com/),numeric
+pff,The id of the game issued by [Pro Football Focus](https://www.pff.com/),numeric
+espn,The id of the game issued by [ESPN](https://www.espn.com/),numeric
+away_rest,Days of rest that the away team is coming off of.,numeric
+home_rest,Days of rest that the home team is coming off of.,numeric
+away_moneyline,Odds for away team to win the game.,numeric
+home_moneyline,Odds for home team to win the game.,numeric
+spread_line,"The spread line for the game. A positive number means the home team was favored by that many points, a negative number means the away team was favored by that many points. This lines up with the result column.",numeric
+away_spread_odds,Odds for away team to cover the spread.,numeric
+home_spread_odds,Odds for home team to cover the spread.,numeric
+total_line,The total line for the game.,numeric
+under_odds,Odds that total score of game would be under the total_line.,numeric
+over_odds,Odds that total score of game would be over the total_ine.,numeric
+div_game,Binary indicator of whether or not game was played by 2 teams in the same division.,numeric
+roof,"What was the status of the stadium's roof? One of outdoors, open, closed, dome",character
+surface,What type of ground the game was played on,character
+temp,The temperature at the stadium (for outdoors and open only),numeric
+wind,The speed of the wind in miles/hour (for outdoors and open only),numeric
+away_qb_id,GSIS Player ID for away team starting quarterback.,numeric
+home_qb_id,GSIS Player ID for home team starting quarterback.,numeric
+away_qb_name,Name of away team starting QB.,character
+home_qb_name,Name of home team starting QB.,character
+away_coach,Name of the head coach of the away team,character
+home_coach,Name of the head coach of the home team,character
+referee,Name of the game's referee (head official),character
+stadium_id,ID of Stadium that game took place in,character
+stadium,Name of the stadium,character
