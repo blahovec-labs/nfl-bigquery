@@ -25,6 +25,9 @@ def test_merge_sql_keys_on_gsis_id_and_skips_key_in_update():
     assert "position = s.position" in sql
     # key column is not reassigned in the UPDATE SET clause
     assert "gsis_id = s.gsis_id" not in sql.split("WHEN NOT MATCHED")[0].split("UPDATE SET")[1]
+    # key IS present in the INSERT half
+    insert_part = sql.split("WHEN NOT MATCHED")[1]
+    assert "gsis_id" in insert_part
 
 
 def test_upsert_players_stages_merges_drops():
@@ -38,3 +41,13 @@ def test_upsert_players_stages_merges_drops():
     assert "MERGE" in merge_sql
     drop_sql = c.query.call_args_list[1][0][0]
     assert "DROP TABLE" in drop_sql
+    job_config = c.load_table_from_dataframe.call_args.kwargs["job_config"]
+    assert job_config.write_disposition == bigquery.WriteDisposition.WRITE_TRUNCATE
+
+
+def test_upsert_players_empty_df_returns_zero():
+    c = MagicMock(spec=bigquery.Client)
+    n = upsert_players(c, target="p.d.dim_players", df=pd.DataFrame(), schema=[], key="gsis_id")
+    assert n == 0
+    c.load_table_from_dataframe.assert_not_called()
+    c.query.assert_not_called()

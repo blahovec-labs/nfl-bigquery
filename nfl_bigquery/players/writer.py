@@ -49,7 +49,9 @@ def upsert_players(
         ),
     ).result()
     log.info("staged %d rows in %s", len(df), stage)
-    client.query(build_merge_sql(target=target, source=stage, schema=schema, key=key)).result()
-    client.query(f"DROP TABLE `{stage}`").result()
+    try:
+        client.query(build_merge_sql(target=target, source=stage, schema=schema, key=key)).result()
+    finally:
+        client.query(f"DROP TABLE `{stage}`").result()
     log.info("merged + dropped stage for %s", target)
     return len(df)
