@@ -23,3 +23,13 @@ def test_parquet_fixtures_present():
     for name in ["pbp", "schedules", "players", "player_stats"]:
         df = pd.read_parquet(FIX_DIR / f"{name}_2023_sample.parquet")
         assert len(df) > 0
+
+
+def test_dictionary_types_are_valid_tokens():
+    valid = ["numeric", "character", "integer", "logical", "date", "timestamp"]
+    for name in ["pbp", "schedules", "players", "player_stats"]:
+        df = pd.read_csv(DICT_DIR / f"{name}.csv")
+        bad = df[~df["type"].isin(valid)]
+        assert bad.empty, (
+            f"{name}.csv has invalid type tokens:\n{bad.to_string()}"
+        )

@@ -5,7 +5,7 @@ old_game_id,Legacy NFL game ID.,character
 home_team,String abbreviation for the home team.,character
 away_team,String abbreviation for the away team.,character
 season_type,'REG' or 'POST' indicating if the game belongs to regular or post season.,character
-week,Season week.,numeric
+week,Season week.,integer
 posteam,String abbreviation for the team with possession.,character
 posteam_type,String indicating whether the posteam team is home or away.,character
 defteam,String abbreviation for the team on defense.,character
@@ -21,7 +21,7 @@ drive,Numeric drive number in the game.,numeric
 sp,Binary indicator for whether or not a score occurred on the play.,numeric
 qtr,Quarter of the game (5 is overtime).,numeric
 down,The down for the given play.,numeric
-goal_to_go,Binary indicator for whether or not the posteam is in a goal down situation.,numeric
+goal_to_go,Binary indicator for whether or not the posteam is in a goal down situation.,integer
 time,Time at start of play provided in string format as minutes:seconds remaining in the quarter.,character
 yrdln,String indicating the current field position for a given play.,character
 ydstogo,Numeric yards in distance from either the first down marker or the endzone in goal down situations.,numeric
@@ -284,7 +284,7 @@ defensive_extra_point_attempt,"Binary indicator whether or not the defense was a
 defensive_extra_point_conv,Binary indicator whether or not the defense successfully scored on an extra point attempt.,numeric
 safety_player_name,String name for the player who scored a safety.,character
 safety_player_id,Unique identifier for the player who scored a safety.,character
-season,4 digit number indicating to which season the game belongs to.,numeric
+season,4 digit number indicating to which season the game belongs to.,integer
 cp,Numeric value indicating the probability for a complete pass based on comparable game situations.,numeric
 cpoe,For a single pass play this is 1 - cp when the pass was completed or 0 - cp when the pass was incomplete. Analyzed for a whole game or season an indicator for the passer how much over or under expectation his completion percentage was.,numeric
 series,"Starts at 1, each new first down increments, numbers shared across both teams NA: kickoffs, extra point/two point conversion attempts, non-plays, no posteam",numeric
@@ -322,29 +322,29 @@ drive_start_yard_line,String indicating where a given drive started consisting o
 drive_end_yard_line,String indicating where a given drive ended consisting of team half and yard line number.,character
 drive_play_id_started,Play_id of the first play in the given drive.,numeric
 drive_play_id_ended,Play_id of the last play in the given drive.,numeric
-away_score,Total points scored by the away team.,numeric
-home_score,Total points scored by the home team.,numeric
+away_score,Total points scored by the away team.,integer
+home_score,Total points scored by the home team.,integer
 location,Either 'Home' o 'Neutral' indicating if the home team played at home or at a neutral site.,character
-result,Equals home_score - away_score and means the game outcome from the perspective of the home team.,numeric
-total,Equals home_score + away_score and means the total points scored in the given game.,numeric
+result,Equals home_score - away_score and means the game outcome from the perspective of the home team.,integer
+total,Equals home_score + away_score and means the total points scored in the given game.,integer
 spread_line,"The closing spread line for the game. A positive number means the home team was favored by that many points, a negative number means the away team was favored by that many points. (Source: Pro-Football-Reference)",numeric
 total_line,The closing total line for the game. (Source: Pro-Football-Reference),numeric
-div_game,Binary indicator for if the given game was a division game.,numeric
+div_game,Binary indicator for if the given game was a division game.,integer
 roof,"One of 'dome', 'outdoors', 'closed', 'open' indicating indicating the roof status of the stadium the game was played in. (Source: Pro-Football-Reference)",character
 surface,What type of ground the game was played on. (Source: Pro-Football-Reference),character
-temp,The temperature at the stadium only for 'roof' = 'outdoors' or 'open'.(Source: Pro-Football-Reference),numeric
-wind,The speed of the wind in miles/hour only for 'roof' = 'outdoors' or 'open'. (Source: Pro-Football-Reference),numeric
+temp,The temperature at the stadium only for 'roof' = 'outdoors' or 'open'.(Source: Pro-Football-Reference),integer
+wind,The speed of the wind in miles/hour only for 'roof' = 'outdoors' or 'open'. (Source: Pro-Football-Reference),integer
 home_coach,First and last name of the home team coach. (Source: Pro-Football-Reference),character
 away_coach,First and last name of the away team coach. (Source: Pro-Football-Reference),character
 stadium_id,ID of the stadium the game was played in. (Source: Pro-Football-Reference),character
 game_stadium,Name of the stadium the game was played in. (Source: Pro-Football-Reference),character
 success,Binary indicator wheter epa > 0 in the given play.,numeric
 passer,Name of the dropback player (scrambles included) including plays with penalties.,character
-passer_jersey_number,Jersey number of the passer.,numeric
+passer_jersey_number,Jersey number of the passer.,integer
 rusher,Name of the rusher (no scrambles) including plays with penalties.,character
-rusher_jersey_number,Jersey number of the rusher.,numeric
+rusher_jersey_number,Jersey number of the rusher.,integer
 receiver,Name of the receiver including plays with penalties.,character
-receiver_jersey_number,Jersey number of the receiver.,numeric
+receiver_jersey_number,Jersey number of the receiver.,integer
 pass,Binary indicator if the play was a pass play (sacks and scrambles included).,numeric
 rush,Binary indicator if the play was a rushing play.,numeric
 first_down,Binary indicator if the play ended in a first down.,numeric
@@ -355,7 +355,7 @@ passer_id,ID of the player in the 'passer' column.,character
 rusher_id,ID of the player in the 'rusher' column.,character
 receiver_id,ID of the player in the 'receiver' column.,character
 name,"Name of the 'passer' if it is not 'NA', or name of the 'rusher' otherwise.",character
-jersey_number,Jersey number of the player listed in the 'name' column.,numeric
+jersey_number,Jersey number of the player listed in the 'name' column.,integer
 id,ID of the player in the 'name' column.,character
 fantasy_player_name,Name of the rusher on rush plays or receiver on pass plays (from official stats).,character
 fantasy_player_id,ID of the rusher on rush plays or receiver on pass plays (from official stats).,character
@@ -366,7 +366,7 @@ home_opening_kickoff,"1 if the home team received the opening kickoff, 0 otherwi
 qb_epa,Gives QB credit for EPA for up to the point where a receiver lost a fumble after a completed catch and makes EPA work more like passing yards on plays with fumbles.,numeric
 xyac_epa,"Expected value of EPA gained after the catch, starting from where the catch was made. Zero yards after the catch would be listed as zero EPA.",numeric
 xyac_mean_yardage,Average expected yards after the catch based on where the ball was caught.,numeric
-xyac_median_yardage,Median expected yards after the catch based on where the ball was caught.,numeric
+xyac_median_yardage,Median expected yards after the catch based on where the ball was caught.,integer
 xyac_success,Probability play earns positive EPA (relative to where play started) based on where ball was caught.,numeric
 xyac_fd,Probability play earns a first down based on where the ball was caught.,numeric
 xpass,Probability of dropback scaled from 0 to 1.,numeric
