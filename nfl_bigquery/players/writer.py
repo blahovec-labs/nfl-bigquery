@@ -12,7 +12,8 @@ import uuid
 import pandas as pd
 from google.cloud import bigquery
 
-from nfl_bigquery.schema import ColumnSpec
+from nfl_bigquery.schema import ColumnSpec, to_bq_schema
+from nfl_bigquery.writer import coerce_df_for_bq
 
 log = logging.getLogger(__name__)
 
@@ -42,9 +43,12 @@ def upsert_players(
         return 0
     proj, ds, _ = target.split(".")
     stage = f"{proj}.{ds}._dim_players_stage_{uuid.uuid4().hex[:8]}"
+    bq_schema = to_bq_schema(schema)
+    df = coerce_df_for_bq(df, bq_schema)
     client.load_table_from_dataframe(
         df, stage,
         job_config=bigquery.LoadJobConfig(
+            schema=bq_schema,
             write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
         ),
     ).result()

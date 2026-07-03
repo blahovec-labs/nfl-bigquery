@@ -6,13 +6,13 @@ import pandas as pd
 from google.cloud import bigquery
 
 from nfl_bigquery.players.writer import build_merge_sql, upsert_players
-from nfl_bigquery.schema import BqMode, ColumnSpec
+from nfl_bigquery.schema import BqMode, BqType, ColumnSpec, to_bq_schema
 
 
-def _spec(name: str, mode: str = "NULLABLE") -> ColumnSpec:
-    return ColumnSpec(name=name, type="STRING", mode=cast(BqMode, mode), short_description="x",
-                      business_definition="x", semantic_tags=[], valid_range=None,
-                      valid_values=None, example_value=None, gotchas=[],
+def _spec(name: str, mode: str = "NULLABLE", type: str = "STRING") -> ColumnSpec:
+    return ColumnSpec(name=name, type=cast(BqType, type), mode=cast(BqMode, mode),
+                      short_description="x", business_definition="x", semantic_tags=[],
+                      valid_range=None, valid_values=None, example_value=None, gotchas=[],
                       source_field=name, dictionary_type="character", deprecated_in_year=None)
 
 
@@ -51,3 +51,42 @@ def test_upsert_players_empty_df_returns_zero():
     assert n == 0
     c.load_table_from_dataframe.assert_not_called()
     c.query.assert_not_called()
+
+
+def test_upsert_players_coerces_float64_int64_and_pins_schema():
+    """FLOAT64 columns that are INT64 in the schema must be coerced before staging.
+
+    This is the bug that caused `dim_players` MERGE to fail on real nflverse data:
+    nflverse returns height/weight/draft_year/draft_round/draft_pick as float64,
+    but DIM_PLAYERS_SCHEMA declares them INT64. Without coercion the stage table
+    auto-detects FLOAT64, and BigQuery refuses to MERGE FLOAT64 → INT64.
+    """
+    c = MagicMock(spec=bigquery.Client)
+    schema = [
+        _spec("gsis_id", "REQUIRED"),
+        _spec("height", type="INT64"),
+    ]
+    # height arrives from nflverse as float64 (NA-capable)
+    df = pd.DataFrame({"gsis_id": ["00-1"], "height": [72.0]})
+    assert df["height"].dtype == float  # confirm precondition: source is float64
+
+    upsert_players(c, target="p.d.dim_players", df=df, schema=schema)
+
+    # Verify the df handed to load_table_from_dataframe has been coerced to Int64
+    call = c.load_table_from_dataframe.call_args
+    loaded_df: pd.DataFrame = call.args[0]
+    assert loaded_df["height"].dtype.name == "Int64", (
+        f"expected Int64, got {loaded_df['height'].dtype}"
+    )
+
+    # Verify the job_config carries an explicit schema matching to_bq_schema(schema)
+    job_config: bigquery.LoadJobConfig = call.kwargs["job_config"]
+    expected_bq_schema = to_bq_schema(schema)
+    actual_schema = job_config.schema
+    assert actual_schema is not None, "job_config.schema must not be None"
+    assert len(actual_schema) == len(expected_bq_schema), (
+        f"schema length mismatch: {len(actual_schema)} vs {len(expected_bq_schema)}"
+    )
+    for actual, expected in zip(actual_schema, expected_bq_schema):
+        assert actual.name == expected.name
+        assert actual.field_type == expected.field_type

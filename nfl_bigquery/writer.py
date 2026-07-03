@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 Partition = TimePartition | SeasonRangePartition | None
 
 
-def _coerce_df_for_bq(df: pd.DataFrame, schema: list[bigquery.SchemaField]) -> pd.DataFrame:
+def coerce_df_for_bq(df: pd.DataFrame, schema: list[bigquery.SchemaField]) -> pd.DataFrame:
     df = df.copy()
     by_name = {f.name: f for f in schema}
     for col in df.columns:
@@ -108,7 +108,7 @@ class BigQueryWriter:
             ),
         ).result()
         if bq_schema:
-            df = _coerce_df_for_bq(df, bq_schema)
+            df = coerce_df_for_bq(df, bq_schema)
         self.client.load_table_from_dataframe(
             df, str(ref),
             job_config=bigquery.LoadJobConfig(
