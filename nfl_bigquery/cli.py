@@ -28,6 +28,12 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("--players-table", required=True, help="project.dataset.dim_players")
     pl.add_argument("--dry-run", action="store_true")
 
+    dc = sub.add_parser("docs", help="Render table documentation")
+    dc.add_argument("--format", required=True,
+                    choices=["bq-apply", "llm", "dictionary", "markdown", "dbt"])
+    dc.add_argument("--table", help="project.dataset.table (required for bq-apply)")
+    dc.add_argument("--output", default="-", help="output path or - for stdout")
+
     return parser
 
 
@@ -56,6 +62,53 @@ def main(argv: list[str] | None = None) -> int:
         from nfl_bigquery.players.sync import run_players
 
         return run_players(ns, client=NflverseClient(), bq_client=bigquery.Client())
+    if ns.command == "docs":
+        from nfl_bigquery.docs.renderers import (
+            render_bq_apply,
+            render_dbt,
+            render_dictionary_rows,
+            render_llm,
+            render_markdown,
+        )
+        from nfl_bigquery.docs.taxonomy import TABLES
+
+        if ns.format == "llm":
+            text = render_llm(TABLES)
+        elif ns.format == "markdown":
+            text = render_markdown(TABLES)
+        elif ns.format == "dbt":
+            text = render_dbt(TABLES)
+        elif ns.format == "bq-apply":
+            if not ns.table:
+                parser.error("--table is required for --format bq-apply")
+            from google.cloud import bigquery
+
+            bq = bigquery.Client()
+            table_name = ns.table.split(".")[-1]
+            desc = {n: d for n, d in render_bq_apply(table_name, ns.table)}
+            fetched = bq.get_table(ns.table)
+            new_schema = [
+                bigquery.SchemaField(
+                    f.name, f.field_type, mode=f.mode,
+                    description=desc.get(f.name, f.description or ""),
+                )
+                for f in fetched.schema
+            ]
+            fetched.schema = new_schema
+            bq.update_table(fetched, ["schema"])
+            print(f"applied descriptions to {ns.table}")
+            return 0
+        else:  # dictionary
+            import json
+
+            text = json.dumps(render_dictionary_rows(TABLES), indent=2)
+        if ns.output == "-":
+            print(text)
+        else:
+            from pathlib import Path
+
+            Path(ns.output).write_text(text, encoding="utf-8")
+        return 0
     return 0
 
 
