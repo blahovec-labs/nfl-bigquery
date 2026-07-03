@@ -24,6 +24,10 @@ def build_parser() -> argparse.ArgumentParser:
     sy.add_argument("--resume", action="store_true")
     sy.add_argument("--dry-run", action="store_true")
 
+    pl = sub.add_parser("players", help="Upsert the dim_players dimension")
+    pl.add_argument("--players-table", required=True, help="project.dataset.dim_players")
+    pl.add_argument("--dry-run", action="store_true")
+
     return parser
 
 
@@ -45,6 +49,13 @@ def main(argv: list[str] | None = None) -> int:
         bq = bigquery.Client()
         return run_sync(ns, client=NflverseClient(), writer=BigQueryWriter(client=bq),
                         runs=RunsTable(client=bq))
+    if ns.command == "players":
+        from google.cloud import bigquery
+
+        from nfl_bigquery.client import NflverseClient
+        from nfl_bigquery.players.sync import run_players
+
+        return run_players(ns, client=NflverseClient(), bq_client=bigquery.Client())
     return 0
 
 
