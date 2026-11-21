@@ -1,6 +1,6 @@
 [project]
 name = "nfl-bigquery"
-version = "0.1.2"
+version = "0.1.3"
 description = "NFL play-by-play → BigQuery: idempotent nflverse ingestion + LLM-friendly docs + verification"
 readme = "README.md"
 license = { text = "MIT" }
