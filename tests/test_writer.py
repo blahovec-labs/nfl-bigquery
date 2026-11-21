@@ -46,7 +46,7 @@ def test_create_range_partition_when_missing():
     assert table.range_partitioning.range_.interval == 1
 
 
-def test_write_season_deletes_then_loads():
+def test_write_season_replaces_the_season():
     c = _client()
     got = bigquery.Table("p.d.nfl_plays", schema=[bigquery.SchemaField("season", "INT64")])
     c.get_table.return_value = got
@@ -54,7 +54,7 @@ def test_write_season_deletes_then_loads():
     df = pd.DataFrame({"season": [2023, 2023]})
     n = w.write_season(TableRef.parse("p.d.nfl_plays"), df, season=2023)
     assert n == 2
-    delete_sql = c.query.call_args[0][0]
+    delete_sql = c.query_and_wait.call_args[0][0]
     assert "DELETE FROM" in delete_sql and "season = @season" in delete_sql
     assert c.load_table_from_dataframe.called
     job_config = c.load_table_from_dataframe.call_args.kwargs["job_config"]
@@ -66,7 +66,7 @@ def test_write_season_empty_df_noop():
     w = BigQueryWriter(client=c)
     n = w.write_season(TableRef.parse("p.d.x"), pd.DataFrame(), season=2023)
     assert n == 0
-    assert not c.query.called
+    assert not c.query.called and not c.query_and_wait.called
 
 
 def test_tableref_parse_rejects_two_parts():

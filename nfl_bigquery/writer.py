@@ -1,9 +1,10 @@
 # nfl_bigquery/writer.py
 """TableRef + BigQueryWriter: season-scoped idempotent writes.
 
-Fact tables are keyed on the INT64 `season` column: DELETE WHERE season=@s, then
-PARQUET load (WRITE_APPEND). create_table_if_missing dispatches on the partition
-descriptor (DAY time-partition vs integer RANGE(season) vs none).
+Fact tables are keyed on the INT64 `season` column: stage the season, then
+DELETE WHERE season=@s + INSERT in one transaction. create_table_if_missing
+dispatches on the partition descriptor (DAY time-partition vs integer
+RANGE(season) vs none).
 """
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ import pandas as pd
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 
+from nfl_bigquery._atomic import atomic_replace
 from nfl_bigquery.partition import SeasonRangePartition, TimePartition
 
 log = logging.getLogger(__name__)
@@ -93,28 +95,20 @@ class BigQueryWriter:
         log.info("created table %s", ref)
 
     def write_season(self, ref: TableRef, df: pd.DataFrame, *, season: int) -> int:
-        """DELETE rows for `season`, then INSERT df. Returns rows inserted."""
+        """Replace the rows for `season` with df, atomically. Returns rows written.
+
+        Stages df, then DELETE + INSERT in one transaction (see _atomic.py), so a
+        failed load leaves the season's existing rows untouched. An empty df is a
+        no-op: nothing is deleted. The table must exist (`run_sync` creates it).
+        """
         if df.empty:
             log.info("write_season: empty df for %s season=%s", ref, season)
             return 0
-        try:
-            bq_schema = list(self.client.get_table(str(ref)).schema)
-        except NotFound:
-            bq_schema = []
-        self.client.query(
-            f"DELETE FROM `{ref}` WHERE season = @season",
-            job_config=bigquery.QueryJobConfig(
-                query_parameters=[bigquery.ScalarQueryParameter("season", "INT64", season)],
-            ),
-        ).result()
-        if bq_schema:
-            df = coerce_df_for_bq(df, bq_schema)
-        self.client.load_table_from_dataframe(
-            df, str(ref),
-            job_config=bigquery.LoadJobConfig(
-                write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
-                schema=bq_schema or None,
-            ),
-        ).result()
-        log.info("wrote %d rows to %s season=%s", len(df), ref, season)
-        return len(df)
+        bq_schema = list(self.client.get_table(str(ref)).schema)
+        n = atomic_replace(
+            self.client, str(ref), coerce_df_for_bq(df, bq_schema), bq_schema,
+            "season = @season",
+            [bigquery.ScalarQueryParameter("season", "INT64", season)],
+        )
+        log.info("wrote %d rows to %s season=%s", n, ref, season)
+        return n
