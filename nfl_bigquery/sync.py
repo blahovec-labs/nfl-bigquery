@@ -57,6 +57,7 @@ def run_sync(ns: argparse.Namespace, *, client, writer, runs) -> int:
 
     done = runs.completed_seasons(ref=runs_ref) if ns.resume else set()
 
+    failed: list[int] = []
     for season in seasons:
         if season in done:
             log.info("resume: skipping season %s", season)
@@ -79,4 +80,9 @@ def run_sync(ns: argparse.Namespace, *, client, writer, runs) -> int:
         except Exception as e:  # noqa: BLE001 - one bad season must not abort the backfill
             log.exception("season %s failed", season)
             runs.record_failed(ref=runs_ref, season=season, error=str(e)[:1000])
+            failed.append(season)
+    if failed:
+        # Keep going past a bad season, but exit non-zero so the job alerts.
+        log.error("sync finished with %d failed season(s): %s", len(failed), failed)
+        return 1
     return 0

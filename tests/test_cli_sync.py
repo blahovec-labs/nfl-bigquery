@@ -88,7 +88,9 @@ def test_sync_failed_season_records_failed_and_continues():
     runs = MagicMock()
     runs.completed_seasons.return_value = set()
     rc = run_sync(ns, client=client, writer=writer, runs=runs)
-    assert rc == 0
+    # The other season still runs, but the job must report failure: otherwise a
+    # failed write (or a shrink-guard refusal) is visible only in the run ledger.
+    assert rc == 1
     runs.record_failed.assert_called_once()
     assert client.load_pbp.call_count == 2
     runs.record_success.assert_called_once()
